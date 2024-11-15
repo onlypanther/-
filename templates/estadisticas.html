@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Estadísticas - Análisis de Electrodomésticos</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <h1>Estadísticas</h1>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <ul>
+            <li><a href="/home">Inicio</a></li>
+            <li><a href="/historial">Historial</a></li>
+            <li><a href="/estadisticas">Estadísticas</a></li>
+            <li><a href="/logout">Cerrar Sesión</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="stats-card">
+            <h2>Resumen General</h2>
+            <div class="stats-grid">
+                <div class="stats-item">
+                    <h3>Total de Análisis</h3>
+                    <span class="stats-number">
+                        {% if stats.total_scans is not none %}
+                            {{ stats.total_scans }}
+                        {% else %}
+                            0
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="stats-item">
+                    <h3>Electrodomésticos Buenos</h3>
+                    <span class="stats-number">
+                        {% if stats.good_results is not none %}
+                            {{ stats.good_results }}
+                        {% else %}
+                            0
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="stats-item">
+                    <h3>Electrodomésticos Malos</h3>
+                    <span class="stats-number">
+                        {% if stats.bad_results is not none %}
+                            {{ stats.bad_results }}
+                        {% else %}
+                            0
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-card">
+            <h2>Porcentajes</h2>
+            <div class="stats-grid">
+                <div class="stats-item">
+                    <h3>Buenos</h3>
+                    <span class="stats-number">
+                        {% if stats.good_percentage is not none %}
+                            {{ "%.1f"|format(stats.good_percentage) }}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="stats-item">
+                    <h3>Malos</h3>
+                    <span class="stats-number">
+                        {% if stats.bad_percentage is not none %}
+                            {{ "%.1f"|format(stats.bad_percentage) }}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2024 Análisis de Electrodomésticos</p>
+    </footer>
+</body>
+</html>

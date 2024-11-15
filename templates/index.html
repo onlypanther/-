@@ -1,63 +1,155 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ElectroStore</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Análisis de Electrodomésticos</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- Página de Inicio -->
     <header class="header">
         <div class="logo">
-            <h1>Electro Store</h1>
-        </div>
-        <div class="private-app">
-            <p>App de uso privado</p>
+            <h1>Análisis de Electrodomésticos</h1>
         </div>
     </header>
 
-    <section class="hero">
-        <img src="ruta/a/la/imagen.jpg" alt="Imagen de lavadoras">
-        <div class="hero-text">
-            <p>“La innovación inteligente comienza aquí en ElectroStore”</p>
-            <button class="btn-acceder">Acceder</button>
-        </div>
-    </section>
-
-    <!-- Página ¿Cómo Funciona la AI? -->
     <nav class="navbar">
         <ul>
-            <li><a href="#">¿Cómo funciona?</a></li>
-            <li><a href="#">Subir imagen</a></li>
-            <li><a href="#">Catálogo</a></li>
+            <li><a href="/"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="/historial"><i class="fas fa-history"></i> Historial</a></li>
+            <li><a href="/estadisticas"><i class="fas fa-chart-bar"></i> Estadísticas</a></li>
+            <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
         </ul>
     </nav>
 
-    <section class="ai-section">
-        <img src="ruta/a/otra/imagen.jpg" alt="Imagen de lavadoras">
-        <div class="info-text">
-            <h2>¿Cómo Funciona la AI?</h2>
-            <p>
-                La herramienta de inteligencia artificial se usa de esta forma para nuestros trabajadores:
-                analiza imágenes de componentes de neveras y lavadoras para detectar daños o defectos.
-                Sube una foto y nuestra IA te indicará si la pieza está en buen estado o necesita reparación.
-            </p>
-        </div>
-    </section>
+    <div class="container">
+        <div class="info-section">
+            <h2><i class="fas fa-robot"></i> ¿Cómo funciona nuestro sistema de IA?</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <i class="fas fa-brain card-icon"></i>
+                    <h3>Inteligencia Artificial Avanzada</h3>
+                    <p>Utilizamos una red neuronal convolucional (ResNet18) entrenada con miles de imágenes de electrodomésticos. Esta red ha aprendido a identificar patrones y características que determinan el estado de los aparatos.</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-camera-retro card-icon"></i>
+                    <h3>Análisis de Imagen</h3>
+                    <p>Al subir una imagen, nuestro sistema analiza múltiples aspectos como textura, color, forma y patrones específicos que indican el estado del electrodoméstico. Todo esto en cuestión de segundos.</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-chart-pie card-icon"></i>
+                    <h3>Resultados Precisos</h3>
+                    <p>Obtendrás un análisis detallado con porcentajes de probabilidad para cada categoría (bueno/malo), permitiéndote tomar decisiones informadas sobre el estado de tu electrodoméstico.</p>
+                </div>
+            </div>
 
-    <!-- Página de revisión de piezas -->
-    <section class="revision-section">
-        <header>
-            <h2>Electro AI</h2>
-        </header>
+            <div class="info-steps">
+                <h3><i class="fas fa-list-ol"></i> Pasos para usar el sistema:</h3>
+                <ol>
+                    <li><i class="fas fa-image"></i> Toma una foto clara del electrodoméstico, asegurándote de que esté bien iluminada</li>
+                    <li><i class="fas fa-upload"></i> Sube la imagen usando el botón "Seleccionar Imagen" de abajo</li>
+                    <li><i class="fas fa-spinner"></i> Espera unos segundos mientras nuestro sistema analiza la imagen</li>
+                    <li><i class="fas fa-check-circle"></i> Recibe un resultado detallado del análisis</li>
+                </ol>
+            </div>
+        </div>
+
         <div class="upload-area">
-            <p>Envía la pieza en revisión</p>
-            <input type="file" id="file-upload" accept="image/*">
-            <button class="btn-upload">Subir</button>
+            <h2><i class="fas fa-cloud-upload-alt"></i> Subir Imagen</h2>
+            <p>Selecciona una imagen de un electrodoméstico para analizar</p>
+            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+            <button class="btn" onclick="document.getElementById('imageInput').click()">
+                <i class="fas fa-file-upload"></i> Seleccionar Imagen
+            </button>
+            <div id="loadingSpinner" class="loading-spinner" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i> Procesando...
+            </div>
+            <img id="imagePreview" alt="Vista previa" style="display: none;">
+            <div id="resultado" class="resultado"></div>
         </div>
-    </section>
+    </div>
 
-    <script src="script.js"></script>
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2024 Análisis de Electrodomésticos</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const resultado = document.getElementById('resultado');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Mostrar vista previa
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+
+                // Enviar imagen para análisis
+                const formData = new FormData();
+                formData.append('file', file);
+
+                // Mostrar spinner y ocultar resultado anterior
+                loadingSpinner.style.display = 'block';
+                resultado.style.display = 'none';
+
+                fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    loadingSpinner.style.display = 'none';
+                    resultado.style.display = 'block';
+
+                    if (data.error) {
+                        resultado.innerHTML = `
+                            <div class="resultado-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>Error: ${data.error}</p>
+                            </div>
+                        `;
+                    } else {
+                        const estiloResultado = data.prediccion === 'bueno' ? 'resultado-bueno' : 'resultado-malo';
+                        const iconoResultado = data.prediccion === 'bueno' ? 'fa-check-circle' : 'fa-times-circle';
+                        
+                        resultado.innerHTML = `
+                            <div class="${estiloResultado}">
+                                <i class="fas ${iconoResultado}"></i>
+                                <h3>Resultado: ${data.prediccion.toUpperCase()}</h3>
+                                <div class="probabilidades">
+                                    <p><i class="fas fa-thumbs-up"></i> Probabilidad bueno: ${data.probabilidad_bueno}</p>
+                                    <p><i class="fas fa-thumbs-down"></i> Probabilidad malo: ${data.probabilidad_malo}</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    loadingSpinner.style.display = 'none';
+                    resultado.style.display = 'block';
+                    resultado.innerHTML = `
+                        <div class="resultado-error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p>Error al procesar la imagen</p>
+                        </div>
+                    `;
+                    console.error('Error:', error);
+                });
+            }
+        });
+    </script>
 </body>
 </html>

@@ -1,29 +1,73 @@
-function uploadImage() {
-    const imageInput = document.getElementById('file-upload'); // Obtiene el input de archivo
-    const file = imageInput.files[0]; // Obtiene el primer archivo seleccionado
+document.addEventListener('DOMContentLoaded', function() {
+    const imageInput = document.getElementById('imageInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const resultado = document.getElementById('resultado');
+    const loadingSpinner = document.getElementById('loadingSpinner');
 
-    if (file) {
-        const formData = new FormData(); // Crea un nuevo objeto FormData
-        formData.append('file', file); // Agrega el archivo al FormData
+    if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Mostrar vista previa
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
 
-        // Envía la imagen al servidor con Fetch API
-        fetch('/upload', {
-            method: 'POST',
-            body: formData // El cuerpo de la solicitud es el FormData
-        })
-        .then(response => response.json()) // Convierte la respuesta a JSON
-        .then(data => {
-            const messageElement = document.getElementById('responseMessage'); // Elemento para mostrar mensajes
-            if (data.message) {
-                messageElement.innerHTML = `Éxito: ${data.message}`; // Muestra mensaje de éxito
-            } else if (data.error) {
-                messageElement.innerHTML = `Error: ${data.error}`; // Muestra mensaje de error
+                // Enviar imagen para análisis
+                const formData = new FormData();
+                formData.append('file', file);
+
+                // Mostrar spinner y ocultar resultado anterior
+                loadingSpinner.style.display = 'block';
+                resultado.style.display = 'none';
+
+                fetch('/predict', {  // Cambiado de /upload a /predict
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    loadingSpinner.style.display = 'none';
+                    resultado.style.display = 'block';
+
+                    if (data.error) {
+                        resultado.innerHTML = `
+                            <div class="resultado-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>Error: ${data.error}</p>
+                            </div>
+                        `;
+                    } else {
+                        const estiloResultado = data.prediccion === 'bueno' ? 'resultado-bueno' : 'resultado-malo';
+                        const iconoResultado = data.prediccion === 'bueno' ? 'fa-check-circle' : 'fa-times-circle';
+                        
+                        resultado.innerHTML = `
+                            <div class="${estiloResultado}">
+                                <i class="fas ${iconoResultado}"></i>
+                                <h3>Resultado: ${data.prediccion.toUpperCase()}</h3>
+                                <div class="probabilidades">
+                                    <p><i class="fas fa-thumbs-up"></i> Probabilidad bueno: ${data.probabilidad_bueno}</p>
+                                    <p><i class="fas fa-thumbs-down"></i> Probabilidad malo: ${data.probabilidad_malo}</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    loadingSpinner.style.display = 'none';
+                    resultado.style.display = 'block';
+                    resultado.innerHTML = `
+                        <div class="resultado-error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p>Error al procesar la imagen</p>
+                        </div>
+                    `;
+                    console.error('Error:', error);
+                });
             }
-        })
-        .catch(error => {
-            alert('Hubo un error al subir la imagen.'); // Manejo de errores
         });
-    } else {
-        alert('Por favor, selecciona una imagen.'); // Mensaje si no se selecciona un archivo
     }
-}
+});
